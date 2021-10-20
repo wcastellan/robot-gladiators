@@ -1,7 +1,9 @@
 var randomNumber = function(min, max) {
-  var value = Math.floor(Math.random() * (max - min + 1) + min);
+  var value = Math.floor(Math.random() * (max - min) + min);
   return value;
 };
+
+
 
 // function to set name
 var getPlayerName = function() {
@@ -64,47 +66,43 @@ var enemyInfo = [
 ];
 
 var startGame = function() {
+
   playerInfo.reset();
   
 for(var i = 0; i < enemyInfo.length; i++) {
-    console.log(enemyInfo[i].name);
-    console.log(i);
-    console.log(enemyInfo[i].name + " is at " + i + " index");
 
-    for (var i = 0; i < enemyInfo.length; i++) {
-        if (playerInfo.health > 0) {
-            // let player know what round they are in, remember that arrays start at 0 so it needs to have 1 added to it
-            window.alert("Welcome to Robot Gladiators! Round " + (i + 1));
-    
-            // pick new enemy to fight based on the index of the enemyNames array
-            var pickedEnemyObj = enemyInfo[i];
-    
-            //reset enemy.health before starting new fight
-            pickedEnemyObj.health = randomNumber(40, 60);
-    
-            // use debugger to pause script from running and check what's going on at that moment in the code
-            // debugger;
-    
-            // pass the pickedEnemyName variable's value into the fight function, where it will assume the value of the enemyName parameter
-            fight(pickedEnemyObj);
+    console.log(playerInfo);
 
-            if (playerInfo.health > 0 && i < enemyInfo.length - 1) {
-              var storeConfirm = window.confirm("the fight is over, visit the store before the next round?");
+    if (playerInfo.health > 0) {
+      // let player know what round they are in, remember that arrays start at 0 so it needs to have 1 added to it
+      window.alert("Welcome to Robot Gladiators! Round " + (i + 1));
+    
+      // pick new enemy to fight based on the index of the enemyNames array
+      var pickedEnemyObj = enemyInfo[i];
+    
+      //reset enemy.health before starting new fight
+      pickedEnemyObj.health = randomNumber(40, 60);
 
-              if (storeConfirm){
-                shop();
-              }
-            }
+      console.log(pickedEnemyObj);
+    
+      // pass the pickedEnemyName variable's value into the fight function, where it will assume the value of the enemyName parameter
+      fight(pickedEnemyObj);
+
+      if (playerInfo.health > 0 && i < enemyInfo.length - 1) {
+        var storeConfirm = window.confirm("the fight is over, visit the store before the next round?");
+
+        if (storeConfirm){
+          shop();
+          }
         }
+      }
     
         else {
-            window.alert("You have lost your robot in battle! Game Over!");
-            break;
+          window.alert("You have lost your robot in battle! Game Over!");
+          break;
         }
       }
       endGame();
-    
-    }
 };
 
 var fightOrSkip = function() {
@@ -127,15 +125,24 @@ var fightOrSkip = function() {
     if (confirmSkip) {
       window.alert(playerInfo.name + ' has decided to skip this fight. Goodbye!');
       // subtract money from playerInfo.money for skipping
-      playerInfo.playerMoney = playerInfo.money - 10;
+      playerInfo.money = Math.max(0, playerInfo.money - 10);
       return true;
     }
   }
   return false;
-}
+};
 
 var fight = function(enemy) {
+
+  var isPlayerTurn = true;
+
+  if (Math.random() > 0.5) {
+    isPlayerTurn = false;
+  }
+
     while (playerInfo.health > 0 && enemy.health > 0) {
+
+      if (isPlayerTurn){
      
       if (fightOrSkip()) {
         break;
@@ -162,8 +169,8 @@ var fight = function(enemy) {
       } else {
         window.alert(enemy.name + ' still has ' + enemy.health + ' health left.');
       }
-  
-      // remove players's health by subtracting the amount set in the enemyAttack variable
+    } else {
+     // remove players's health by subtracting the amount set in the enemyAttack variable
       var damage = randomNumber(enemy.attack - 3, enemy.attack);
 
       playerInfo.health = Math.max(0, playerInfo.health - damage);
@@ -180,6 +187,9 @@ var fight = function(enemy) {
         window.alert(playerInfo.name + ' still has ' + playerInfo.health + ' health left.');
       }
     }
+    // switch turn order for next round 
+    isPlayerTurn = !isPlayerTurn;
+  }
   };
 
 var endGame = function() {
@@ -198,7 +208,7 @@ var endGame = function() {
   else {
     window.alert("Thank you for playing Robot Gladiators! Come back soon!");
   }
-}
+};
 
 var shop = function() {
   var shopOptionPrompt = window.prompt(
@@ -225,6 +235,6 @@ var shop = function() {
       shop();
       break;
   }
-}
+};
 
 startGame();
